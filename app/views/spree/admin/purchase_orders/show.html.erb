@@ -1,0 +1,124 @@
+<h1><u><%= link_to @purchase_order.number, edit_admin_purchase_order_url(@purchase_order.number) %></u></h1>
+<div class='clearfix'></div>
+
+<hr size='1' width='100%' color='#d8d8d8' />
+
+<table width='99%' cellspacing='1' cellpadding='3' border='0' bgcolor='#efefef'>
+  <colgroup>
+    <col width='10%' />
+    <col width='55%' />
+    <col width='15%' />
+    <col width='5%' />
+    <col width='15%' />
+  </colgroup>
+  <tr valign='middle' bgcolor='#efefef'>
+    <td class='line-item-header'>SKU</td>
+    <td class='line-item-header'>Description</td>
+    <td class='line-item-header'>Price</td>
+    <td class='line-item-header'>Qty</td>
+    <td class='line-item-header align-right'>Line total</td>
+  </tr>
+  <% @purchase_order.purchase_order_line_items.each do |l| %>
+    <tr bgcolor='#ffffff'>
+      <td class="align-center"><%= l.variant.sku %></td>
+      <td>
+        <%= l.product.name.split(":").first %> <%= l.returnable ? "" : "(NON-RETURNABLE)" %> 
+        <% unless l.comment.blank? %>
+          <br/>
+          <%= l.comment %>
+        <% end %>
+      </td>
+      <td class="align-center"><%= number_to_currency(l.price) %></td>
+      <td class="align-center"><%= l.quantity %></td>
+      <td class="align-right"><%= number_to_currency(l.price * l.quantity) %></td>
+    </tr>
+  <% end %>
+
+  <tr bgcolor='#ffffff'>
+    <td colspan='4' class='align-right'>Subtotal</td>
+    <td class='align-right'><%= number_to_currency(@purchase_order.gross_amount) %></td>
+  </tr>
+  <tr bgcolor='#ffffff'>
+    <td colspan='4' class='align-right'>Shipping</td>
+    <td class='align-right'><%= number_to_currency(@purchase_order.shipping.to_f) %></td>
+  </tr>    
+  <tr bgcolor='#ffffff'>
+    <td colspan='4' class='align-right'>Tax</td>
+    <td class='align-right'><%= number_to_currency(@purchase_order.tax) %></td>
+  </tr>    
+  <tr bgcolor='#ffffff'>
+    <td colspan='4' class='align-right'>Order total</td>
+    <td class='align-right'><%= number_to_currency(@purchase_order.total) %></td>
+  </tr>
+</table>
+
+<h2><center><u><%= link_to "Edit this purchase order", edit_admin_purchase_order_url(@purchase_order.number) %></u></center></h2>
+
+<div class="seven columns omega">
+
+    <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
+      <legend align="center">
+        Change Log
+      </legend>
+      <br/>
+      <table>
+        <tr><td>Started</td><td><%= @purchase_order.created_at.strftime("%m/%d/%Y %l:%M %P") %></td></tr>
+        <tr><td>Entered</td><td><%= @purchase_order.entered_at ? @purchase_order.entered_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+        <tr><td>Submitted</td><td><%= @purchase_order.submitted_at ? @purchase_order.submitted_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+        <tr><td>Completed</td><td><%= @purchase_order.completed_at ? @purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+      </table>
+    </fieldset>
+    
+    <% unless not @purchase_order.received_purchase_order_line_items or @purchase_order.received_purchase_order_line_items.size == 0 %>
+      <div class="clear"></div>
+      <br/>
+      <br/>
+      
+      <fieldset data-hook="received-purchase-order-line-items" class="no-border-bottom">
+        <legend align="center">Received line items</legend>
+        <ol>
+        <% @purchase_order.received_purchase_order_line_items.each do |r| %>
+          <li>
+            <%= r.purchase_order_line_item.variant.sku %> &ndash;
+            <%= r.purchase_order_line_item.product.name.split(":").first %>
+            <br/>
+            Received <strong><%= r.quantity %></strong> at 
+            <%= r.received_at.strftime("%m/%d/%Y %l:%M %P") %>
+          </li>
+        <% end %>
+        </ol>          
+      </fieldset>
+    <% end %>
+  </div>
+<hr size='1' width='100%' color='#d8d8d8' />
+
+  <table width="100%">
+    <tr valign='top'>
+      <td class='align-left'><b>SUPPLIER</b></td>
+    </tr>
+    <tr valign='top'>
+      <td class='align-left small'><%= @purchase_order.supplier.details %></td>
+    </tr>
+  </table>
+  <table width="100%" align="right" border="0">
+    <tr valign='top'>
+      <td class='align-left'><b>ACCOUNT</b></td>
+    </tr>
+    <tr valign='top'>
+      <td class='align-left small'>
+        <%= @purchase_order.supplier_contact.details %>
+      </td>
+    </tr>
+  </table>
+  <table width="100%" align="right" border="0">
+    <tr valign='top'>
+      <td class='align-left'><b>SHIP TO</b></td>
+    </tr>
+    <tr valign='top'>
+      <td class='align-left small'>
+        <%= @purchase_order.address.to_s %>
+        <br/>
+        <b>Shipping method:</b> <%= @purchase_order.shipping_method.name %>
+      </td>
+    </tr>
+  </table>

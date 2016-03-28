@@ -1,0 +1,20 @@
+<% unless line_item.new_record? %>
+  <%= f.fields_for :purchase_order_line_items, line_item do |l| %>
+    <tr valign="top">
+      <td width="40%">
+        <%= line_item.variant.product.name.split(":").first %>
+        &mdash;
+        <%= link_to("Edit", edit_admin_product_variant_path(line_item.variant.product.to_param, line_item.variant_id)) %>
+        <br/>
+        SKU: <%= line_item.variant.sku %>
+        <br/>
+        On hand: <%= line_item.variant.on_hand %>
+
+      </td>
+      <td width="30%"><%= l.number_field :quantity  %></td>
+      <td width="30%"><%= l.text_field :price %></td>
+    </tr>
+  <% end %>
+    
+<% end %>
+

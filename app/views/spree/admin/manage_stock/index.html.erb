@@ -1,0 +1,39 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:manage_stock) %>
+<% end %>
+
+<%= render :partial => "spree/admin/variants/autocomplete", :formats => :js %>
+
+<%= form_tag(admin_stock_update_path, method: "get") do |f| %>
+
+  <div data-hook="admin-manage-stock-index">
+    <div class="alpha eighteen columns omega">
+      <div class="sixteen columns alpha omega">
+        <fieldset class="no-border-bottom">
+          <legend align="center">
+            <%= t(:look_up_stock_by_name_or_sku) %>
+          </legend>
+
+          <div data-hook="add_product_name" style="float: left">
+
+            <%= text_field_tag :variant_id, "", class: "variant_autocomplete fullwidth", placeholder: "Search for a product", style: "width: 900px" %>
+            <br/>
+            <br/>
+
+            <div class="form-buttons filter-actions actions" data-hook="buttons">
+              <%= button t(:next), 'icon-arrow-right' %>
+            </div>
+
+          </div> 
+        </fieldset>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% content_for :head do %>
+  <%= csrf_meta_tags %>
+	<%= javascript_tag 'var expand_variants = true;' %>
+<% end %>

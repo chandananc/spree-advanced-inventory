@@ -1,0 +1,24 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:editing_supplier) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:back_to_suppliers_list), spree.admin_suppliers_path, :icon => 'icon-arrow-left' %>
+  </li>
+<% end %>
+
+<%= form_for [:admin, @supplier], html: { multipart: true } do |f| %>
+  <fieldset class="no-border-top">
+
+    <%= render :partial => 'form', :locals => { :f => f } %>
+
+    <div class="clear"></div>
+
+    <%= render :partial => 'spree/admin/shared/edit_resource_links' %>
+  </fieldset>
+
+<% end %>
+

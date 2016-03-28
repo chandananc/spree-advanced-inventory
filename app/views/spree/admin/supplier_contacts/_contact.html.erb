@@ -1,0 +1,31 @@
+<% unless contact.new_record? %>
+  <div class="supplier-contact" class="fullwidth" >
+    <b><%= contact.email.blank? ?  contact.name : link_to(contact.name, "mailto:#{contact.email}") %></b>
+    
+    <% unless contact.job_title.blank? %>
+      (<%= contact.job_title %>)
+    <% end %>
+    
+    <span style="float: right">
+      <%= link_to "Edit", edit_admin_supplier_contact_path(contact.id) %>
+      <br/>
+      <%= link_to "Remove", admin_supplier_contact_path(contact.id), method: "delete" %>
+    </span>
+
+    <br/>
+
+    <%= contact.phone.blank? ? "" : "Phone: #{contact.phone}<br/>".html_safe %>
+    <%= contact.fax.blank? ? "" : "Fax: #{contact.fax}<br/>".html_safe %>
+    <%= contact.url.blank? ? "" : "Web site: #{link_to contact.url, contact.url}<br/>".html_safe %>
+
+    <%= contact.address1.blank? ? "" : "#{contact.address1}<br/>".html_safe %>
+    <%= contact.address2.blank? ? "" : "#{contact.address2}<br/>".html_safe %>
+    <%= contact.address3.blank? ? "" : "#{contact.address3}<br/>".html_safe %>
+
+    <%= contact.city.blank? ? "" : "#{contact.city}, ".html_safe %>
+    <%= contact.state.blank? ? "" : "#{contact.state} ".html_safe %>
+    <%= contact.zip.blank? ? "" : "#{contact.zip}<br/>".html_safe %>
+    <%= contact.country.blank? ? "" : "#{contact.country}<br/>".html_safe %>
+  </div>
+  <div class="clear"></div>
+<% end %>

@@ -1,0 +1,39 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  Inventory Scan History
+<% end %>
+
+<style>
+  .unscanned-inventory-header div { font-weight: bold; }
+  .inventory-row { padding: 4px 0px; }
+</style>
+<%= form_tag admin_last_scanned_at_path, {method: "GET"} do %>
+  <%= text_field_tag :last_scan_date, params[:last_scan_date], placeholder: "Show books not scanned after this date", class: "datepicker datepicker_from", size: 50 %>
+  <%= submit_tag "Filter" %>
+  &nbsp;
+  <%= link_to "Reset", admin_last_scanned_at_path %>
+<% end %>
+<br/>
+<h3>Showing
+<% if params[:last_scan_date] %>
+  not scanned since <%= @last_scanned_at.strftime("%m/%d/%Y") %>
+<% else %>
+  unscanned inventory
+<% end %>
+</h3>
+<br/>
+
+
+<div class="sixteen columns alpha omega index unscanned-inventory-header">
+  <div class="four columns alpha">Title</div>
+  <div class="three columns">SKU</div>
+  <div class="three columns">Scanned</div>
+  <div class="two columns">In Queue<br/>(Captured)</div>
+  <div class="two columns">Reserved<br/>(Authorized)</div>
+  <div class="two columns omega">Available</div>
+</div>
+
+<div class="sixteen columns alpha omega">
+  <%= render partial: "variant", collection: @variants %>
+</div>

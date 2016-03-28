@@ -1,0 +1,38 @@
+<%= render :partial => 'spree/admin/shared/configuration_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:advanced_inventory_settings) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:edit), admin_edit_advanced_inventory_settings_path %>
+  </li>
+<% end %>
+
+
+<div class="alpha twelve columns omega">
+  <fieldset data-hook="advanced_inventory_settings_address" class=" no-border-bottom">
+    <legend align="center"><%= t(:office_and_shipping_address) %></legend>
+
+
+    <h1><%= Spree::Config.advanced_inventory_office_company %></h1>
+    <%= Spree::Config.advanced_inventory_office_address1 %><br/>
+    <%= Spree::Config.advanced_inventory_office_address2 %><br/>
+    <%= Spree::Config.advanced_inventory_office_phone %><br/>
+    <%= Spree::Config.advanced_inventory_office_email %><br/>
+    <%= Spree::Config.advanced_inventory_office_city %>,
+    <%= Spree::Config.advanced_inventory_office_state %>
+    <%= Spree::Config.advanced_inventory_office_zip %><br/>
+    <%= Spree::Config.advanced_inventory_office_country %><br/>
+    <br/>
+  </fieldset>
+  <fieldset data-hook="advanced_inventory_settings_tax_id" class=" no-border-bottom">
+    <legend align="center"><%= t(:federal_tax_id) %></legend>
+
+    <h3><%= Spree::Config.advanced_inventory_tax_id %></h3>
+  </fieldset>
+</div>
+
+<div class="clear"></div>
+<%= button_link_to t(:edit), admin_edit_advanced_inventory_settings_path %>

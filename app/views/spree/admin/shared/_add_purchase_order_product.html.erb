@@ -1,0 +1,28 @@
+<%= render :partial => "spree/admin/variants/autocomplete", :formats => :js %>
+
+<%= form_for [:admin, Spree::PurchaseOrderLineItem.new], remote: true do |f| %> 
+	<%= hidden_field_tag :purchase_order_id, @purchase_order.id %>
+
+  <div data-hook="add_product_name" class="field seven columns">
+    <%= label_tag :add_product_name, t(:name_or_sku) %>
+    <%= hidden_field_tag :add_variant_id, "", :class => "variant_autocomplete fullwidth" %>
+
+  </div>
+
+  <div class="clear"></div>
+
+  <div data-hook="add_quantity" class="field two columns">
+    <%= label_tag :add_quantity, t(:qty) %><br/>
+    <%= number_field_tag :add_quantity,  1, :min => 0, style: "width: 60px" %>
+  </div>
+
+  <div data-hook="add_price" class="field two columns">
+    <%= label_tag :add_price, t(:cost) %><br/>
+    <%= text_field_tag :add_price, "", size: 6 %>
+  </div>
+
+  <div data-hook="add_button" class="field two columns">
+    <br/>
+    <%= submit_tag "Add", class: "button icon-plus fullwidth", icon: "icon-plus"%>
+  </div>
+<% end %>

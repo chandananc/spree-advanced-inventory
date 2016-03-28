@@ -1,0 +1,188 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+    <script src="//code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="//code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+    <title>Inventory Update<%= @variant ? " - #{@variant.sku} - #{@product.name}" : "" %></title> 
+    <style>
+      table.barby-barcode { border-spacing: 0; width: 230px; height: 40px; }
+      tr.barby-row {}
+      td.barby-cell { width: 3px; height: 3px; }
+      td.barby-cell.on { background: #000; }
+      [contenteditable="true"] , input, textarea {
+              -webkit-user-select: auto !important;
+              -khtml-user-select: auto !important;
+              -moz-user-select: auto !important;
+              -ms-user-select: auto !important;
+              -o-user-select: auto !important;
+              user-select: auto !important;  
+      }
+      #sku { font-size: 2em; }
+    </style>
+  </head>
+  <body>
+    <div id="invPage" data-role="page">
+      <%= form_tag admin_update_by_sku_path, id: "search-sku-form", method: "get"  do %>
+        <center>
+          <fieldset data-role="controlgroup" data-type="horizontal">
+            <legend>Payment capture:</legend>
+            <%= radio_button_tag :disable_payment_captures, "true", @select_disabled %>
+            <%= label_tag :disable_payment_captures_true, "Disabled" %>
+            <%= radio_button_tag :disable_payment_captures, "false", @select_enabled %>
+            <%= label_tag :disable_payment_captures_false, "Enabled" %>        
+          </fieldset>
+        </center>
+        <%= text_field_tag :sku, params[:sku], placeholder: "Search by SKU", "data-clear-btn" => "true", "data-clear-btn-text" => "CLEAR", autofocus: true %>
+ 
+        <%= submit_tag "Search" %>
+      <% end %>
+
+      <%= form_tag admin_update_sku_path, id: "update-sku-form", method: "post"  do %>
+        <% if @variant %>
+          <h4 class="ui-bar ui-bar-a ui-corner-all">
+            <% if @product.images and @product.master_images %>
+              <%= link_to("#{mini_image(@product, align: "left", valign: "middle", hspace: "10", width: 50)} 
+                          #{@product.name.split(":").first} &ndash;
+                          #{@variant.options_text}
+                          ".html_safe, 
+                          edit_admin_product_variant_url(@product,@variant), target: "_NEW") %>
+            <% else %>
+              <%= link_to @product.name.split(":").first, edit_admin_product_variant_url(@product, @variant) %>
+
+            <% end %>
+          </h4>
+     
+          <% if flash[:error] %>
+            <script>
+    $( "<div class='ui-body ui-body-a ui-corner-all error'><h1><%= flash[:error] %></h1></div>" )
+      .css({ "display": "block", "opacity": 0.96, "background-color": "#990000", "color": "#ffffff", "z-index": "3", "text-shadow": "0 !important" })
+      .appendTo( $.mobile.pageContainer )
+      .delay( 2000 )
+      .fadeOut( 4000, function() {
+        $( this ).remove();
+      });
+            </script>
+          <% elsif flash[:success] %>
+            <script>
+    $( "<div class='ui-body ui-body-a ui-corner-all success'><h1><%= flash[:success] %></h1></div>" )
+      .css({ "display": "block", "opacity": 0.96, "background-color": "#009900", "color": "#ffffff", "z-index": "3", "text-shadow": "0 !important" })
+      .appendTo( $.mobile.pageContainer )
+      .delay( 2000 )
+      .fadeOut( 4000, function() {
+        $( this ).remove();
+      });
+            </script>
+
+          <% end %>
+
+           <div class="ui-body ui-body-a ui-corner-all">
+            <center>
+              <fieldset data-role="controlgroup" data-type="horizontal">
+                <legend>Inventory Section</legend>
+                <% 1.upto(10) do |i| %>
+                  <%= radio_button_tag "section", i, @variant.section == i %>
+                  <%= label_tag "section_#{i}", i %>
+                <% end %>
+              </fieldset>
+              
+              <div class='clearfix'><br></div>
+
+              <div class="ui-field-contain">
+                <div>Row or Rack</div>
+                <select name="subsection" id="subsection">
+                  <%= options_for_select 1.upto(30), @variant.subsection %>
+                </select>                
+              </div>
+
+              <div class='clearfix'><br></div>
+
+              <fieldset data-role="controlgroup" data-type="horizontal">
+                <legend>Pallet or Shelf</legend>
+                <% 1.upto(10) do |i| %>
+                  <%= radio_button_tag "pallet", i, @variant.pallet == i %>
+                  <%= label_tag "pallet_#{i}", i %>
+                <% end %>                
+              </fieldset>
+
+            <br/>
+            <br/>
+            <div class="ui-grid-a">
+              <div class="ui-block-a"><div class="ui-bar ui-bar-a">
+                <%= number_field_tag "total_on_hand", @total_on_hand, "data-clear-btn" => "true" %>
+                <%= label_tag "total_on_hand", "Total stock counted" %>
+              </div></div>
+              <div class="ui-block-b"><div class="ui-bar ui-bar-a">
+                <%= text_field_tag "cost_price", @variant.cost_price, placeholder: "Our cost", "data-clear-btn" => "true" %>
+                <%= label_tag "cost_price", "Our cost" %>
+              </div></div>
+            </div>
+            <br/>
+            <br/>
+            <%= hidden_field_tag :variant_id, @variant.id %>
+            <%= submit_tag "Save" %>
+            <br/>
+            <br/>
+            <div class="ui-grid-b">
+              <div class="ui-block-b"><div class="ui-bar ui-bar-a">
+                  <%= @variant.count_on_hand > 0 ? @variant.count_on_hand : 0 %> available to order<br/>
+                  <% if @backordered > 0 %>
+                    <%= link_to "#{@backordered} units on backorder", url_for_backordered_order_search(@variant), target: "_NEW" %>
+                  <% end %>
+                  <%= link_to "#{@total_reserved} allocated to unpaid orders (reserved)", url_for_reserved_order_search(@variant), target: "_NEW" %>
+                  <%= link_to "#{@total_queued} allocated to paid orders (queued)", url_for_queued_order_search(@variant), target: "_NEW"%>
+
+              </div></div>
+              <% if @total_on_hand and @variant.cost_price %>
+                <div class="ui-block-b"><div class="ui-bar ui-bar-a">
+                    <strong>Inventory Aging Summary</strong>
+                    <br/>
+                    <br/>
+                    7 days: <%= @variant.available_stock_units(7.days.ago, Time.new).size %><br/>
+                    30 days: <%= @variant.available_stock_units(30.days.ago, 8.days.ago).size %><br/>
+                    90 days: <%= @variant.available_stock_units(90.days.ago, 31.days.ago).size %><br/>
+                    90+ days: <%= @variant.available_stock_units(2.years.ago, 91.days.ago).size %><br/>
+                    <br/>
+                </div></div>
+                <div class="ui-block-b"><div class="ui-bar ui-bar-a">                                    
+                    <strong>Cost for <%= @total_on_hand %> units<br/><%= Spree::Money.new(@total_on_hand * @variant.cost_price) %></strong>
+                    <br/>
+                    <br/>
+                    Recent PO history:<br/>
+                    <%= recent_price_history(@variant).gsub(/\n/, "<br/>").html_safe %>
+                </div></div>
+              <% end %>
+            </div>
+          </center>
+        </div> 
+        <% else %>
+          <center><%= link_to "Search Ingram for this title", advanced_search_url() + "?title_search=#{params[:sku]}", target: "_NEW" %></center>
+        <% end %>
+        
+      <% end %>
+    </div>  
+    <script type="text/javascript">
+
+      $("#invPage").on("pageinit", "#sku", function() { 
+          $('input').on('touchstart', function () {
+              $(this).focus();   // inside this function the focus works
+              focused = $(this); // just for the example when I click next on fiddle
+              $(this).select();
+          });
+          $('#sku').trigger('touchstart');
+      });
+
+      $(document).ready(function() {
+        $('input[type=text]').click(function() { $(this).select(); });
+        setTimeout(function() { $('#sku').trigger('click'); $('#sku').trigger('change'); }, 500);
+        $('#sku').focus().select();
+        $('#sku').setSelectionRange(0,999); 
+      });
+
+
+
+
+    </script>   
+</body>
+</html>

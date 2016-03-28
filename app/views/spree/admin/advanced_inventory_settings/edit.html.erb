@@ -1,0 +1,107 @@
+<%= render partial: 'spree/admin/shared/configuration_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:editing_advanced_inventory_settings) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:cancel), spree.admin_advanced_inventory_settings_path, icon: 'icon-arrow-left' %>
+  </li>
+<% end %>
+
+
+
+<fieldset class="no-border-top">
+  <div data-hook="admin_advanced_inventory_settings_form_fields">
+    <div class="alpha twelve columns">
+      <%= form_tag admin_advanced_inventory_settings_path, method: "put" %>
+        <div class="six columns alpha">
+          <fieldset data-hook="advanced_inventory_settings_address" class=" no-border-bottom">
+            <legend align="center"><%= t(:office_and_shipping_address) %></legend>
+
+            <div data-hook="advanced_inventory_office_address" class="field">
+              <%= text_field_tag :advanced_inventory_office_company, 
+                Spree::Config.advanced_inventory_office_company, 
+                placeholder: "Company name", class: "fullwidth"
+              %>
+              <br/>
+
+              <%= text_field_tag :advanced_inventory_office_address1, 
+                Spree::Config.advanced_inventory_office_address1, 
+                placeholder: "Address line one", class: "fullwidth"
+              %>
+              <br/>
+
+              <%= text_field_tag :advanced_inventory_office_address2, 
+                Spree::Config.advanced_inventory_office_address2, 
+                placeholder: "Address line two", class: "fullwidth"
+              %>
+              <br/>
+
+              <%= text_field_tag :advanced_inventory_office_phone, 
+                Spree::Config.advanced_inventory_office_phone, 
+                placeholder: "Phone number", class: "fullwidth"
+              %>
+              <br/>
+
+              <%= text_field_tag :advanced_inventory_office_email, 
+                Spree::Config.advanced_inventory_office_email, 
+                placeholder: "E-mail address", class: "fullwidth"
+              %>
+              <br/>
+
+              <%= text_field_tag :advanced_inventory_office_city, 
+                Spree::Config.advanced_inventory_office_city, 
+                placeholder: "City", style: "margin-bottom: 4px;", size: 10
+              %>
+
+              <%= text_field_tag :advanced_inventory_office_state, 
+                Spree::Config.advanced_inventory_office_state, 
+                placeholder: "State", style: "margin-bottom: 4px;", size: 6
+              %>
+
+              <%= text_field_tag :advanced_inventory_office_zip, 
+                Spree::Config.advanced_inventory_office_zip, 
+                placeholder: "ZIP", style: "margin-bottom: 4px;", size: 4
+              %>
+              <br/>
+
+              <%= text_field_tag :advanced_inventory_office_country, 
+                Spree::Config.advanced_inventory_office_country, 
+                placeholder: "Country", class: "fullwidth"
+              %>
+              <br/>
+              
+            </div>
+            </fieldset>  
+          </div>
+
+
+          <div class="six columns omega">
+          <fieldset data-hook="advanced_inventory_settings" class=" no-border-bottom">
+            <legend align="center"><%= t(:federal_tax_id) %></legend>
+
+            <div data-hook="advanced_inventory_tax_id" class="field">
+              <%= text_field_tag :advanced_inventory_tax_id, 
+                Spree::Config.advanced_inventory_tax_id, 
+                placeholder: "Federal Tax ID", class: "fullwidth"
+              %>
+              <br/>
+
+          </div>  
+
+                 
+        </div>
+        <div class="clear"></div> 
+        <%= submit_tag :save %>
+
+      </form>
+
+    <div class="clear"></div>
+
+  </div>
+  <div class="clear"></div>
+
+</fieldset>
+

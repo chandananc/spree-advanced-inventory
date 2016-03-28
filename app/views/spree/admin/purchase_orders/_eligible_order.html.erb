@@ -1,0 +1,23 @@
+<li class="small" style="border-bottom: 1px #efefef solid; margin-bottom: 4px; padding-bottom: 4px;">
+<label>
+  <input type="checkbox" name="order_ids[]" value="<%= o.id %>" 
+  <%= ((@purchase_order.order_purchase_orders.where(order_id: o.id).size > 0) or (params["order_ids[]"] and params["order_ids[]"].include?(o.id))) ? "CHECKED" : "" %> 
+    <% if @purchase_order.status == "Completed" %>
+      disabled="true"
+    <% end %>
+  />
+
+  <%= link_to o.number, edit_admin_order_path(o.number), target: "_BLANK" %> - 
+  <%= o.ship_address.firstname + " " + o.ship_address.lastname %> -
+  Created: <%= o.created_at.strftime("%m/%d @ %l:%M %P") %> - 
+  $<%= o.total %>
+  
+  <br/>
+  &nbsp;&nbsp;&nbsp;
+
+  Checkout: <%= o.state.upcase %>,
+  Payment: <%= o.payment_state ? o.payment_state.upcase : "NONE" %>,
+  Shipment: <%= o.shipment_state ? o.shipment_state.upcase : "NONE" %>
+</label>
+</li>
+

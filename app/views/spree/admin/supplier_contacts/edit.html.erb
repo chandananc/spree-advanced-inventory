@@ -1,0 +1,27 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:editing_supplier_contact) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:back_to_supplier), spree.edit_admin_supplier_path(@supplier_contact.supplier_id), :icon => 'icon-arrow-left' %>
+  </li>
+<% end %>
+
+<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier_contact } %>
+
+<%= form_for [:admin, @supplier_contact] do |f| %>
+  <fieldset class="no-border-top">
+
+    <%= render :partial => 'form', :locals => { :f => f } %>
+
+    <div class="clear"></div>
+
+    <%= render :partial => 'spree/admin/shared/edit_resource_links' %>
+  </fieldset>
+
+<% end %>
+
+

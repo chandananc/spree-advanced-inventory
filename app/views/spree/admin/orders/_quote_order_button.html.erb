@@ -1,0 +1,24 @@
+<div id="order-button-menu">
+
+  <br/>
+  <%= button_link_to "Quote", 
+    new_admin_order_path + "?is_quote=true", 
+    icon: 'icon-question-sign', 
+    class: 'button icon-question-sign btn-success', 
+    style: 'margin: 0 4px'
+  %>
+
+  <%= button_link_to "Dropship", 
+    new_admin_order_path + "?is_dropship=true", 
+    icon: 'icon-truck', 
+    class: 'button icon-truck btn-success', 
+    style: 'margin: 0 4px'  %>
+
+  <%= button_link_to "Regular", 
+    new_admin_order_path, 
+    icon: 'icon-plus', 
+    class: 'button icon-plus btn-success', 
+    style: 'margin: 0 4px'  %>
+
+  <%= link_to "CLOSE", "#", onclick: "$('#order-button-menu').fadeOut(500); return false;" %>
+</div>

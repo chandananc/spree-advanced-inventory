@@ -1,0 +1,10 @@
+<div class="four columns alpha inventory-row ">
+  <%= variant.name.split(":").first %>
+</div>
+<div class="three columns inventory-row"><%= variant.sku %></div>
+<div class="three columns inventory-row"><%= variant.last_scanned_at ? variant.last_scanned_at.strftime("%m/%d/%Y %l:%m %P") : "Never" %></div>
+<div class="two columns inventory-row"><%= link_to variant.inventory_units.queued.size, url_for_queued_order_search(variant) %></div>
+<div class="two columns inventory-row"><%= link_to variant.inventory_units.reserved.size, url_for_reserved_order_search(variant) %></div>
+<div class="two columns omega inventory-row"><%= link_to variant.count_on_hand,  edit_admin_product_variant_path(variant.permalink, variant.id) %></div>
+<div class="clearfix"></div>
+

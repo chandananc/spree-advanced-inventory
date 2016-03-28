@@ -1,0 +1,149 @@
+<%= csrf_meta_tags %>
+<%= render :partial => "spree/admin/variants/autocomplete", :formats => :js %>
+
+<div data-hook="admin_purchase_order_form_fields">
+  <div class="alpha eighteen columns omega">  
+  <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @purchase_order } %>
+  <%= form_for [:admin, @purchase_order], url: admin_purchase_order_edit_line_items_path(@purchase_order.number), html: {method: "post", onsubmit: "return validateForm()"} do |f| %>
+
+    <div class="twelve columns alpha">
+
+      <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
+        <legend align="center">
+          <%= @purchase_order.dropship ? t(:drop_ship_line_item) : t(:purchase_order_line_items) %>
+        </legend>
+
+        <div class="clear"></div>
+
+        <div data-hook="purchase_order_supplier" class="field">
+          <%= f.label :supplier_contact_id, t(:supplier_and_contact) %> 
+          <%= f.collection_select :supplier_contact_id, 
+            Spree::SupplierContact.eligible_for_select, 
+            :id, 
+            :name_with_supplier, 
+            {},  
+            {class: 'fullwidth select2' } %>
+        </div>
+
+        <div class="clear"></div>
+        <% counter = 1 %>
+        <%= f.fields_for :purchase_order_line_items  do |l| %>
+          <div data-hook="add_product_name" class="twelve columns alpha omega" style="float: left; border-bottom: 1px #d8d8d8 solid; padding-bottom: 10px; margin-bottom: 10px;">
+            <div class="field"><label>Line item #<%= counter  %></label></div>
+
+            <div class="seven columns alpha">
+              <% if l.object.new_record? %>
+                <%= l.text_field :variant_id, 
+                  class: "variant_autocomplete fullwidth", 
+                  placeholder: "Search for a product" %>
+              <% else %>
+                <%= text_field_tag "variant_product_name#{l.object.variant.id}", 
+                  "#{l.object.variant.product.name.split(":").first} SKU: #{l.object.variant.sku}", 
+                    class: "field fullwidth", 
+                    disabled: true %>
+
+                  <%= l.hidden_field :variant_id, value: l.object.variant_id %>
+                  <%= l.hidden_field :id, value: l.object.id %>
+
+              <% end %>
+            </div>
+
+            <div class="four columns omega">
+              <%= l.text_field :comment, placeholder: "Line item comment", size: 40, default: "" %>
+            </div>
+
+            <div class="clear"></div>
+
+
+            <div class="field four columns alpha">
+              <%= l.select :returnable, {"Returnable" => true, "Non-returnable" => false }, { include_blank: false}, class: "fullwidth select2" %>
+            </div>  
+
+            <div class="field four columns">
+              <%= l.select :ship_velocity, ship_velocities.invert, { include_blank: true }, placeholder: "Estimated time to ship",class: "select2 fullwidth"  %>
+            </div>
+          
+
+            <div class="field two columns">
+              <%= l.text_field :quantity, 
+                                class: "field", 
+                                placeholder: "Quantity", 
+                                size: 10, 
+                                default: "1" %>
+            </div>
+            
+            <div class="field two columns omega">
+              <%= l.text_field :price, class: "field", placeholder: "Cost", size: 10  %>
+            </div>
+
+          </div>
+
+          <% counter += 1 %>
+        <% end %>
+
+        <div class="clear"></div>
+        <br/>
+        <p>Set quantity to 0 to remove a line item.</p>
+
+      </fieldset>
+    </div>
+
+    <div class="four columns omega">
+      <fieldset data-hook="purchase-order-info" class="no-border-bottom">
+        <legend align="center">
+          <%= t(@purchase_order.number) %>
+        </legend>
+        Created by: <%= @purchase_order.user.email %>
+        <br/>
+
+        Created on: <%= @purchase_order.created_at %>
+        <br/>
+
+        Status: <%= @purchase_order.status ? @purchase_order.status : "Pending" %>
+        <br/>
+  
+        <% if @purchase_order.valid_status %>
+          Supplier: <%= @purchase_order.supplier.name %>
+          <br/>
+
+          <% if @purchase_order.due_at %> 
+            Need by: <%= @purchase_order.due_at %>
+            <br/>
+          <% end %>
+
+          <br/>
+          Ship to:
+          <br/>
+          <%= @purchase_order.address %>
+          <br/>
+
+          <% unless @purchase_order.comments.blank? %> 
+            <br/>
+            <b>Comments:</b><br/>
+            <%= @purchase_order.comments %>
+            <br/>
+          <% end %>
+
+        <% end %>
+
+      </fieldset>
+
+    </div>
+  </div>
+  <div class="clear"></div>
+  <br/>
+
+  <div class="form-buttons filter-actions actions" data-hook="buttons">
+    <%= button t(:continue), 'icon-arrow-right' %>
+    <span class="or"><%= t(:or) %></span>
+    <%= button_link_to t(:cancel), collection_url, :icon => 'icon-remove' %>
+  </div>
+  <% end %>
+
+
+</div>
+
+<% content_for :head do %>
+	<%= javascript_tag 'var expand_variants = true;' %>
+<% end %>
+

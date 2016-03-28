@@ -1,0 +1,2 @@
+$("#purchase-order-line-item-table").append("<%= escape_javascript(render(partial: "spree/admin/purchase_order_line_items/inline_view", locals: { line_item: @purchase_order_line_item })) %>");
+$("#no-purchase-order-line-items").hide();

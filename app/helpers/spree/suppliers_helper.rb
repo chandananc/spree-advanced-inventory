@@ -1,0 +1,2 @@
+module Spree::SuppliersHelper
+end

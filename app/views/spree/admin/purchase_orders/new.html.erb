@@ -1,0 +1,23 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= @purchase_order.dropship ? t(:new_dropship) :  t(:new_purchase_order) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li>
+    <%= button_link_to t(:back_to_purchase_orders_list), spree.admin_purchase_orders_path, :icon => 'icon-arrow-left' %>
+  </li>
+<% end %>
+
+<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @purchase_order } %>
+
+
+<fieldset class="no-border-top">
+  <%= render :partial => 'form' %>
+  <div class="clear"></div>
+</fieldset>
+
+<script>
+  check_for_unsaved_changes = true;
+</script>

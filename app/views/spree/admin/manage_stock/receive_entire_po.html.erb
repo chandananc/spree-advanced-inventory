@@ -1,0 +1,72 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:receive_and_adjust_stock) %>
+<% end %>
+
+<div data-hook="admin-manage-stock-update">
+  <div class="alpha sixteen columns omega">
+    <fieldset class="no-border-bottom">
+      <legend align="center">
+        Receive all line items for <%= @po.number %>
+      </legend>
+    </fieldset>
+    <%= form_tag(admin_receive_entire_po_path, method: "post", id: "po-#{@po.number}") do |f| %>
+
+    <table class="fullwidth index">
+      <colgroup>
+        <col style="width: 30%">
+        <col style="width: 30%">
+        <col style="width: 15%">
+        <col style="width: 25%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Supplier</th>
+          <th>Quantity</th>
+          <th>Ship velocity</th>
+        </tr>
+      </thead>
+
+      <% @po.purchase_order_line_items.each do |p|%>
+        <% if p.status != "Complete" %>
+            <tr>
+              <td align="center">
+                <%= link_to p.variant.product.short_title_with_article, edit_admin_product_variant_path(product_id: p.variant.product, id: p.variant), target: "_NEW" %> &ndash;
+                <%= p.variant.options_text.gsub!(/Format: /, "") %>
+                <br/>
+                <%= p.variant.sku %>
+              </td>
+              <td align="center">
+                <%= p.purchase_order.supplier %>
+              </td>
+              <td align="center">
+                <%= p.quantity %>
+              </td>
+              <td align="center">
+                <%= p.ship_velocity.present? ? ship_velocities[p.ship_velocity] : "Not specified" %>
+              </td>
+            </tr>
+            <tr>              
+              <td>
+                Section:<br/>
+                <%= select_tag "section-#{p.id}", options_for_select(1.upto(10), p.variant.section), class: "select2 fullwidth" %><br/>
+              </td>
+              <td>
+                Row or rack:<br/>
+                <%= select_tag "subsection-#{p.id}", options_for_select(1.upto(10), p.variant.subsection), class: "select2 fullwidth" %><br/>
+              </td>
+              <td colspan='2'>
+                Pallet or shelf:<br/>
+                <%= select_tag "pallet-#{p.id}", options_for_select(1.upto(10), p.variant.pallet), class: "select2 fullwidth" %><br/>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+    </table>
+    <%= hidden_field_tag "purchase_order_id", @po.id %>
+    <%= submit_tag "Receive entire PO" %>
+    <% end %>
+  </div>
+</div>

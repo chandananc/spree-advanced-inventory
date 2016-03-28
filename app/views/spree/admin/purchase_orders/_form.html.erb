@@ -1,0 +1,232 @@
+<div data-hook="admin_purchase_order_form_fields">
+  <div class="alpha eighteen columns omega">
+    <%= form_for [:admin, @purchase_order] do |f| %>
+
+      <div class="eight columns alpha">
+
+      <fieldset data-hook="purchase-order-details" class="no-border-bottom">
+        <legend align="center">
+          General Information
+        </legend>
+
+        <% if @purchase_order.status == "New" %>
+          <%= f.hidden_field :status, value: "Entered" %>
+        <% else %>
+          <%= f.label :status, t(:manually_override_status) %>
+          <%= f.select :status, Spree::PurchaseOrder.states, {},  {class: 'fullwidth select2' } %>
+        <% end %>
+
+        <div data-hook="purchase_order_order" class="field">
+          <%= f.label :order_id, t(:corresponding_orders) %>
+          <ul id="purchase-order-orders">
+            <% if @purchase_order.status != "Completed" %>
+              <%= render partial: "eligible_order", collection: Spree::Order.eligible_for_po(@purchase_order), as: :o %>
+            <% else %>
+              <%= render partial: "eligible_order", collection: @purchase_order.orders, as: :o %>
+            <% end %>
+          </ul>
+          <br/>
+          <br/>
+          <% if @purchase_order.status != "Complete" and not @purchase_order.dropship %>
+            <label><%= f.check_box :auto_capture_orders, value: true %> Auto-capture unpaid orders when PO is received?</label>
+            <br/>Only applies to selected orders above
+          <% end %>
+        </div>
+
+
+        <div data-hook="purchase_order_supplier" class="field">
+          <%= f.label :supplier_contact_id, t(:supplier_and_contact) %>
+          <%= f.collection_select :supplier_contact_id,
+            Spree::SupplierContact.eligible_for_select,
+            :id,
+            :name_with_supplier,
+            {},
+            {class: 'fullwidth select2' } %>
+        </div>
+
+        <div data-hook="purchase_order_email_subject" class="field">
+          <%= f.label :terms, "Subject to use in e-mail to supplier" %>
+          <br/>
+          <%= f.text_field :email_subject, class: 'fullwidth' %>
+        </div>
+
+        <% if @purchase_order.status == "Submitted" or @purchase_order.resend_po == true %>
+          <div data-hook="purchase_order_resend_po" class="field">
+            <label>
+              <%= f.check_box :resend_po %>
+              Allow PO to be resent to supplier?
+              <br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;(also allows PO to be deleted)
+            </label>
+          </div>
+        <% end %>
+
+      </fieldset>
+
+      <fieldset data-hook="purchase-order-details" class="no-border-bottom">
+        <legend align="center">
+          <%= t(:shipping) %>
+        </legend>
+
+        <% if @purchase_order.dropship %>
+          <%= render partial: "spree/admin/shared/purchase_order_address", locals: { f: f } %>
+
+        <% else %>
+          <%= f.hidden_field :address_id, value: @office_address.id %>
+          <%= @office_address %>
+
+        <% end %>
+
+
+        <div data-hook="purchase_order_shipping_method_id" class="field">
+        <%= f.label :shipping_method_id, "Shipping Method" %>
+        <%= f.select :shipping_method_id,
+          @shipping_methods.map {|sm| ["#{sm.zone.name} - #{sm.name} - #{sm.display_on.size > 0 ? sm.display_on.titleize : "Both"}", sm.id] },
+          {},
+          {class: 'fullwidth' } %>
+        <% if @purchase_order.requires_freight? and flash[:notice] =~ /freight/i %>
+          <div style="color: #900">UPS Freight has been automatically selected for this PO</div>
+        <% end %>
+        </div>
+      </fieldset>
+
+      <fieldset data-hook="purchase-order-details" class="no-border-bottom">
+        <legend align="center">
+          Informational Stuff
+        </legend>
+
+        <div data-hook="purchase_order_terms" class="field">
+          <%= f.label :terms, t(:payment_terms) %>
+          <br/>
+          <%= f.text_field :terms, class: 'fullwidth' %>
+        </div>
+
+        <div data-hook="purchase_order_due_at" class="field">
+          <%= f.label :due_at, t(:date_needed_by) %>
+          <br/>
+          <%= f.text_field :due_at,
+            value: datepicker_field_value(@purchase_order.due_at),
+            class: 'datepicker datepicker-from fullwidth' %>
+        </div>
+
+        <div data-hook="purchase_order_comments" class="field">
+          <%= f.label :comments, t(:comments) %>
+          <br/>
+          <%= f.text_area :comments, class: 'fullwidth', rows: 3 %>
+        </div>
+        <div data-hook="purchase_order_adjustments" class="field">
+          <%= f.label :book_keeping %>
+          <table width="100%" cellspacing="3" cellpadding="0">
+          <thead>
+            <th>Tax</th>
+            <th>Shipping</th>
+            <th>Supplier Inv #</th>
+          </thead>
+
+          <tr valign="top">
+            <td width="33%">
+              <%= f.text_field :tax,
+                class: 'fullwidth',
+                  placeholder: "tax" %>
+            </td>
+            <td width="33%">
+
+              <%= f.text_field :shipping,
+                class: 'fullwidth',
+                  placeholder: "Shipping" %>
+            </td>
+            <td width="33%">
+
+              <%= f.text_field :supplier_invoice_number,
+                class: 'fullwidth',
+                  placeholder: "Supplier Invoice #" %>
+            </td>
+           </tr>
+
+       </table>
+
+        </div>
+      <% if @purchase_order.status != "Submitted" and @purchase_order.status != "Completed" %>
+        <label><input type="checkbox" name="sending_manually" value="1" /> Check this box if you are submitting this PO by hand (or phone/fax)</label>
+      <% end %>
+      <br/>
+      </fieldset>
+    </div>
+
+    <div class="seven columns omega">
+
+      <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
+        <legend align="center">
+          Change Log
+        </legend>
+        <br/>
+        <table>
+          <tr><td>Started</td><td><%= @purchase_order.created_at.strftime("%m/%d/%Y %l:%M %P") %></td></tr>
+          <tr><td>Entered</td><td><%= @purchase_order.entered_at ? @purchase_order.entered_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+          <tr><td>Submitted</td><td><%= @purchase_order.submitted_at ? @purchase_order.submitted_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+          <tr><td>Completed</td><td><%= @purchase_order.completed_at ? @purchase_order.completed_at.strftime("%m/%d/%Y %l:%M %P") : "N/A" %></td></tr>
+        </table>
+      </fieldset>
+      <fieldset data-hook="purchase-order-line-items" class="no-border-bottom">
+        <legend align="center">
+          <%= @purchase_order.dropship ? t(:line_items) : t(:line_items) %>
+        </legend>
+        <br/>
+        <div id="purchase-order-line-items">
+          <%= render partial: "po_line_items", locals: { f: f } %>
+        </div>
+
+        <div class="form-buttons filter-actions actions" data-hook="edit-line-item-buttons">
+          <%= button_link_to t(:edit_line_items), admin_purchase_order_edit_line_items_path(@purchase_order.number) , :icon => 'icon-arrow-left' %>
+
+        </div>
+      </fieldset>
+
+      <% unless not @purchase_order.received_purchase_order_line_items or @purchase_order.received_purchase_order_line_items.size == 0 %>
+        <div class="clear"></div>
+        <br/>
+        <br/>
+
+        <fieldset data-hook="received-purchase-order-line-items" class="no-border-bottom">
+          <legend align="center">Received line items</legend>
+          <% total_recvd = 0 %>
+          <ol>
+          <% @purchase_order.received_purchase_order_line_items.each do |r| %>
+            <li>
+              <%= r.purchase_order_line_item.variant.sku %> &ndash;
+              <%= r.purchase_order_line_item.product.name.split(":").first %>
+              <br/>
+              Received <strong><%= r.quantity %></strong> at
+              <%= r.received_at.strftime("%m/%d/%Y %l:%M %P") %>
+              <% total_recvd += r.quantity.to_i %>
+            </li>
+          <% end %>
+          </ol>
+        </fieldset>
+        <strong><%= total_recvd %></strong> received so far.
+      <% end %>
+    </div>
+
+  <div class="clear"></div>
+  <br/>
+
+
+  <div class="form-buttons filter-actions actions" data-hook="buttons">
+
+    <%= f.submit "Save", class: 'btn btn-success icon icon-arrow-right', name: "submit", id: "save-return" %>
+    <span class="or"><%= t(:or) %></span>
+    <%= f.submit "Save & Edit", class: 'btn btn-success icon icon-arrow-down', name: "submit", id: "save-edit" %>
+    <span class="or"><%= t(:or) %></span>
+    <%= button_link_to t(:cancel), (session[:return_to] ? session[:return_to] : collection_url), :icon => 'icon-remove' %>
+  </div>
+
+  <% end %>
+  </div>
+</div>
+
+<script>
+  $("#purchase_order_supplier_id").select2();
+  $("#purchase_order_shipping_method_id").select2();
+  $("#purchase_order_address_id").select2();
+  $("#purchase_order_status").select2();
+</script>

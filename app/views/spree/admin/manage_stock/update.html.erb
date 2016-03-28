@@ -1,0 +1,132 @@
+<%= render :partial => 'spree/admin/shared/inventory_sub_menu' %>
+
+<% content_for :page_title do %>
+  <%= t(:receive_and_adjust_stock) %>
+<% end %>
+
+<div data-hook="admin-manage-stock-update">
+  <div class="alpha eighteen columns omega">
+    <div class="twelve columns alpha">
+      <fieldset class="no-border-bottom">
+        <legend align="center">
+          <%= t("#{@variant.product.name}".to_sym) %>
+        </legend>
+      </fieldset>
+
+      <p align="center">
+        <% if @variant.product.images.size > 0 %>
+          <%= image_tag(@variant.product.images.first.attachment.url(:mini), 
+                        valign: "middle", 
+                        hspace: 20) %>
+        <% end  %>
+
+        SKU: <%= @variant.sku %> &mdash; 
+        <% @variant.option_values.each do |v| %>
+          <%= v.option_type.presentation %>: <%= v.presentation %>
+
+          <% unless v == @variant.option_values.last %>
+            &mdash;
+          <% end %>
+        <% end %>
+      </p>
+      <br/>
+
+      <h4 align="center"><%= @variant.on_hand %> units in stock &ndash;
+      <%= link_to "Update stock levels manually", edit_admin_product_variant_url(@variant.product.permalink, @variant.id) %>
+      </h4>
+      <br/>
+      <br/>
+
+      <fieldset class="no-border-bottom">
+        <legend align="center">
+          <%= t(:receive_from_purchase_order) %>
+        </legend>
+      </fieldset>
+
+
+      <table class="fullwidth index">
+        <colgroup>
+          <col style="width: 20%">
+          <col style="width: 20%">
+          <col style="width: 25%">
+          <col style="width: 15%">
+          <col style="width: 15%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><%= t(:purchase_order_number) %></th>
+            <th><%= t(:supplier) %></th>
+            <th><%= t("ordered / received".to_sym) %></th>
+            <th><%= t(:receive_now) %></th>
+            <th><%= t(:action) %></th>
+          </tr>
+        </thead>
+
+        <% @po_line_items.each do |p|%>
+          <% if p.status != "Complete" %>
+            <%= form_tag(admin_stock_update_path, method: "post", id: "receive-po-line-item-#{p.id}") do |f| %>
+              <tr>
+                <td align="center">
+                  <%= link_to p.purchase_order.number, 
+                    edit_admin_purchase_order_path(p.purchase_order.number), 
+                    target: "_NEW" %>
+                </td>
+                <td align="center">
+                  <%= p.purchase_order.supplier %>
+                </td>
+                <td align="center">
+                  <%= p.quantity %> 
+                  &#47;
+                  <%= p.received_purchase_order_line_items.sum(:quantity) %>
+                </td>
+                <td>
+                  
+                  <%= number_field_tag "receive", 0, class: "fullwidth" %> 
+                  <%= hidden_field_tag "received_id", p.id %>
+                  <%= hidden_field_tag "variant_id", @variant.id %>
+                  <%= hidden_field_tag "receive_type", "po" %>
+                </td>
+                <td align="center">
+                  <%= button "Go", "icon-cogs" %>
+                </td>
+              </tr>
+              <tr>
+              <td colspan='2'>
+                Section:<br/>
+                <%= select_tag "section-#{p.id}", options_for_select(1.upto(10), p.variant.section), class: "select2 fullwidth" %><br/>
+              </td>
+              <td>
+                Row or rack:<br/>
+                <%= select_tag "subsection-#{p.id}", options_for_select(1.upto(10), p.variant.subsection), class: "select2 fullwidth" %><br/>
+              </td>
+              <td colspan='2'>
+                Pallet or shelf:<br/>
+                <%= select_tag "pallet-#{p.id}", options_for_select(1.upto(10), p.variant.pallet), class: "select2 fullwidth" %><br/>
+              </td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% end %>
+      </table>
+
+
+    </div>
+    <div class="four columns omega">
+
+      <fieldset class="no-border-bottom">
+        <legend align="center">
+          <%= t(:recent_dropships) %>
+        </legend>
+        
+        <% @ds_line_items.each do |d| %>
+          <%= d.purchase_order.number %>
+        <% end %>
+
+        <% if @ds_line_items.size == 0 %>
+          <h4 align="center">None</h4>
+        <% end %>
+
+      </fieldset>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<table width="100%" cellspacing="3" cellpadding="0" class="no-border" id="purchase-order-line-item-table">
+  <thead>
+    <th>Title</th>              
+    <th>QTY</th>
+    <th>GPM</th>
+    <th>Cost</th>
+  </thead>
+  <%= render partial: "spree/admin/purchase_order_line_items/inline_view", 
+    collection: @purchase_order.purchase_order_line_items,
+    as: :line_item,
+    locals: { f: f, po: @purchase_order }
+  %>
+  <tr><td colspan="3" align="right">Tax</td><td><%= Spree::Money.new(@purchase_order.tax) %></td></tr>
+  <tr><td colspan="3" align="right">Shipping</td><td><%= Spree::Money.new(@purchase_order.shipping) %></td></tr>
+  <tr>
+    <td colspan="2" align="right">
+      <strong>TOTAL</strong>
+    </td>
+    <td class="align-center">
+      <%= @purchase_order.gross_profit_percentage %> 
+    </td>
+    <td>
+      <%= Spree::Money.new(@purchase_order.total) %>
+    </td>
+  </tr>
+</table>
+<% unless @purchase_order.has_line_items? %>
+  <div id="no-purchase-order-line-items">None added yet</div>
+<% end %>

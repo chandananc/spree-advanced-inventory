@@ -1,0 +1,33 @@
+<% if @suppliers.size > 0 %>
+  <b>Suppliers &mdash;</b>
+
+  <% @suppliers.each do |s| %>
+
+    <% if s.discounts_available? and params[:price].to_f > 0.0 %>
+      <%= s.abbreviation.upcase %>: 
+      &nbsp;
+
+      COST
+      <%= Spree::Money.new(s.price_at_quantity(@variant, params[:quantity], params[:returnable])) %> 
+      &nbsp;
+
+      PROFIT
+      <%= Spree::Money.new(s.profit_at_quantity(params[:price], @variant, params[:quantity], params[:returnable])) %> 
+      &nbsp;
+
+      MARGIN
+      <%= s.percent_profit_at_quantity(params[:price], @variant, params[:quantity], params[:returnable]) %>%
+
+      <% unless s.id == @suppliers.last.id %>, &nbsp;&nbsp;<% end %>
+    <% elsif params[:price].to_f == 0.0 %>
+        Disabled for $0.00 line items.
+    <% else %>
+      <%= link_to s.abbreviation.upcase, edit_admin_supplier_url(s) %> discounts are not configured.
+    <% end %>
+
+  <% end %>
+
+<% else %>
+  This book has not been ordered yet so no quote estimates are available.
+<% end %>
+

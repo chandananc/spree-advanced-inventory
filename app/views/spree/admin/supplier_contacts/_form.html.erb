@@ -1,0 +1,79 @@
+<%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier_contact } %>
+<div data-hook="admin_supplier_form_fields">
+  <div class="alpha eighteen columns omega">
+  
+    <div class="eight columns alpha">
+
+      <fieldset data-hook="new-supplier-contact" class=" no-border-bottom">
+        <legend align="center"><%= t(:edit_supplier_contact) %></legend>
+
+        <%= form_for [:admin, @supplier_contact] do |f| %>
+
+          <div data-hook="supplier_contact_name" class="field">
+            <%= f.label :name, t(:name) %>
+            <abbr title="required">*</abbr>
+            <%= f.text_field :name, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_job_title" class="field">
+            <%= f.label :job_title, t(:job_title) %>
+            <%= f.text_field :job_title, :class => 'fullwidth' %>
+          </div>        
+
+          <div data-hook="supplier_contact_email" class="field">
+            <%= f.label :email, t(:email_address) %>
+            <abbr title="required">*</abbr>
+            <%= f.text_field :email, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_url" class="field">
+            <%= f.label :url, t(:web_site) %>
+            <%= f.text_field :url, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_phone" class="field">
+            <%= f.label :phone, t(:phone_number) %>
+            <%= f.text_field :phone, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_fax" class="field">
+            <%= f.label :fax, t(:fax_number) %>
+            <%= f.text_field :fax, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_address1" class="field">
+            <%= f.label :address1, t(:address) %>
+            <%= f.text_field :address1, :class => 'fullwidth' %>
+            <%= f.text_field :address2, :class => 'fullwidth' %>
+            <%= f.text_field :address3, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_city" class="field">
+            <%= f.label :city, t(:city) %>
+            <%= f.text_field :city, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_state" class="field">
+            <%= f.label :state, t(:state) %>
+            <%= f.text_field :state, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_zip" class="field">
+            <%= f.label :zip, t(:zip) %>
+            <%= f.text_field :zip, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_country" class="field">
+            <%= f.label :country, t(:country) %>
+            <%= f.collection_select :country, available_countries, :name, :name, { prompt: "Select a country"}, {:class => 'select2 fullwidth'} %>
+          </div>
+
+        <% end  %>
+      </fieldset>
+    </div>
+  </div>
+</div>
+
+<script>
+	$("#supplier_contact_country").select2();
+</script>

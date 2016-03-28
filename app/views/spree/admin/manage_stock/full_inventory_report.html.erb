@@ -1,0 +1,143 @@
+<html>
+  <head>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  <title><%= params[:first_letter] %> - Full Inventory Report</title>
+  <style>
+    table.barby-barcode { border-spacing: 0; width: 230px; height: 40px; }
+    tr.barby-row {}
+    td.barby-cell { width: 3px; height: 3px; }
+    td.barby-cell.on { background: #000; }
+  </style>
+  </head>
+  <body>
+
+  <div style="font-size: 1.4em; margin: 0 auto; text-align: center; width: 100%;">
+    <strong><%= link_to "ALL", admin_full_inventory_report_url + "?hide_backorders=#{params[:hide_backorders]}&disable_payment_captures=#{params[:disable_payment_captures]}" %></strong>
+    
+    <% ("a".."z").each do |l| %>
+      <%= link_to l.upcase, admin_full_inventory_report_url + "?first_letter=#{l}&hide_backorders=#{params[:hide_backorders]}&disable_payment_captures=#{params[:disable_payment_captures]}" %>&nbsp;
+    <% end %>
+
+    <br/>
+
+    <%= form_tag admin_full_inventory_report_path, {method: "GET"} do %>
+      <%= text_field_tag :sku, params[:sku], size: 16, placeholder: "Search by SKU" %>
+      <label><%= check_box_tag :hide_backorders, true, params[:hide_backorders] %> Hide backorders?</label>
+      <label><%= check_box_tag :disable_payment_captures, true, params[:disable_payment_captures] %> Disable payment capturing?</label>
+      <%= hidden_field_tag :first_letter, params[:first_letter] %>
+      <%= hidden_field_tag :page, params[:page] %>
+      <%= submit_tag "Go" %>
+    <% end %>
+
+  </div>
+
+    <table width="95%" border="0" cellspacing="1" cellpadding="5" bgcolor="#d8d8d8">
+      <thead>
+        <th>Title</th>
+        <th>SKU</th>
+        <th>Format</th>
+        <th>In Queue<br/>(Captured)</th>
+        <th>Reserved<br/>(Authorized)</th>
+        <th>Available</th>
+        <th>Total</th>
+        <th>Avg Cost / Unit</th>
+        <th>Unsold cost</th>
+      </thead>
+      <% total = 0.0 %>
+      <% queue_total = 0.0 %>
+      <% reserve_total = 0.0 %>
+      <% available_total = 0.0 %>
+
+      <% @inventory.each do |i| %>
+        <% i.count_on_hand = i.count_on_hand ? i.count_on_hand : 0.0; i.reserved_units = i.reserved_units.to_i; line_cost = 0.0; line_inventory = 0; line_count = 0; line_total = 0.0 %>
+        <% unless params[:hide_backorders].to_s == "true" and i.count_on_hand < 0 and i.reserved_units == 0 %>
+          <tr bgcolor="#ffffff" valign="top">
+            <td><%= i.title.split(":").first %></td>
+            <td align="center" width='150' style="word-wrap: break-word;"word>
+              <%= i.sku[0..30] %>
+            </td>
+            <td align="center" width='100'><%= i.options_text.split(": ").last %></td>
+            <td align="center">              
+              <% i_total = i.inventory_units.queued.size %>
+              <% queue_total += i_total * i.recent_price %>
+              <%= link_to i_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(i_total * i.recent_price)}" %>
+            </td>
+
+            <td align="center">
+              <% r_total = i.inventory_units.reserved.size %>
+              <% reserve_total += r_total * i.recent_price %>
+              <% line_total += r_total * i.recent_price %> 
+              <%= link_to r_total, url_for_queue(i), target: i.id, title: "#{Spree::Money.new(r_total * i.recent_price)}" %>
+            </td>
+
+            <td align="center">
+              <%= link_to i.count_on_hand, edit_admin_product_variant_path(i.permalink, i.id), target: i.id, title: Spree::Money.new(i.count_on_hand * i.recent_price) %>
+
+              <% if i.count_on_hand > 0 %>
+                <% line_cost = i.count_on_hand * i.recent_price %>
+                <% line_total += line_cost %>
+                <% available_total += line_cost %>
+                <% line_inventory += i.count_on_hand %>
+              <% end %>
+            </td>
+
+            <td align="center">
+              <%= r_total + line_inventory %>
+            </td>
+
+            <td align="center">
+              <% recent_price_url = edit_admin_product_variant_url(i.product, i); rp = i.last_n_purchase_order_line_items(30) %>
+              
+              <% if rp and rp.size > 0 %>
+                <% recent_price_url = admin_purchase_orders_url() + "?q[status_cont]=Completed&q[dropship_eq]=false&q[variants_sku_cont]=#{i.sku}" %>
+              <% end %>
+
+              <%= link_to Spree::Money.new(i.recent_price), recent_price_url, target: i.id, title: recent_price_history(i) %>
+            </td>
+            <td align="center"><%= Spree::Money.new(line_total) %></td>
+          </tr>
+          <tr bgcolor="#ffffff" valign="middle">
+            <td colspan='2'>
+
+              <% begin %>
+                <% barcode = Barby::Code39.new(i.sku) %>
+                <%= barcode.to_html.html_safe %>
+              <% rescue %>
+                <!-- No barcode available -->
+              <% end %>
+            </td>
+            <td colspan='8' align='center'>
+              <% if i.section %>
+                Section <%= i.section %>
+              <% end %>
+
+              <% if i.last_scanned_at %>
+                <% if i.last_scanned_at < 31.days.ago %>
+                  <em><%= i.last_scanned_at.strftime("%m/%d/%Y") %></em>
+                <% else %> 
+                  <%= i.last_scanned_at.strftime("%m/%d %l:%M %P") %>
+                <% end  %>
+              <% else %>
+                <em>Unscanned</em>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+      <tr>
+        <td colspan='5'>&nbsp;</td>
+        <td align='center'><%= Spree::Money.new(queue_total) %></td>
+        <td align='center' style='border-left: 1px #fff solid;'><%= Spree::Money.new(reserve_total) %></td>
+        <td align='left' style='border-left: 1px #fff solid;'><%= Spree::Money.new(available_total) %></td>
+        <td colspan='2' align="right"><strong><%= Spree::Money.new(reserve_total + available_total) %></strong></td>
+      </tr>
+  </table>
+  <script>$("#sku").focus().select();</script>
+
+  <center>
+    To see a total cost for just items In Queue or Available, hover over the link in that column.
+  </center>
+
+
+  </body>
+</html>

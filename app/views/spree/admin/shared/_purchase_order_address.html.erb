@@ -1,0 +1,39 @@
+<div data-hook="purchase_order_address_id" class="field">
+  <%= f.label :address_id, t(:select_existing_delivery_address) %> 
+  <br/>
+  <%= f.collection_select :address_id, 
+    Spree::Address.eligible_for_po(@purchase_order), 
+    :id, 
+    :to_select, 
+    { prompt: "Select an address" },  
+    { class: 'fullwidth', style: 'width: 460px' } %>
+
+  <br/>
+  <br/>
+  
+  <%= f.label :new_address, t(:deliver_to_new_address) %> 
+  <br/>
+  <%= text_field_tag "address[firstname]", nil, { placeholder: "First name", size: 20 } %>
+  <%= text_field_tag "address[lastname]", nil, { placeholder: "Last name", size: 35 } %>
+  <br/>
+  <%= text_field_tag "address[company]", nil, { placeholder: "Company name", class: "fullwidth" } %>
+  <br/>          
+  <%= text_field_tag "address[phone]", nil, { placeholder: "Phone number", size: 28 } %>
+  <%= text_field_tag "address[alternative_phone]", nil, { placeholder: "Alternate phone number", size: 27 } %>
+  <br/>
+  <%= text_field_tag "address[address1]", nil, { placeholder: "Address", class: "fullwidth" } %>
+  <br/>
+  <%= text_field_tag "address[address2]", nil, { placeholder: "Address line two", class: "fullwidth" } %>
+  <br/>
+
+  <%= text_field_tag "address[city]", nil, { placeholder: "City", size: 10 } %>
+  <%= text_field_tag "address[state_name]", nil, { placeholder: "State", size: 10 } %>
+  <%= text_field_tag "address[zipcode]", nil, { placeholder: "ZIP code", size: 10 } %>
+  <br/>
+
+  <%= collection_select :address, :country_id, available_countries, :id, :name, { prompt: "Select a country" }, {:class => 'select2 fullwidth'} %>
+  <br/>
+  <%= hidden_field_tag "address[user_id]", spree_current_user.id %>
+
+</div>
+

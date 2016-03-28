@@ -1,0 +1,234 @@
+<div data-hook="admin_supplier_form_fields">
+  <div class="alpha eighteen columns omega">
+    <h3>Fields with a * are required</h3>
+     
+    <div class="eight columns alpha">
+      <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @supplier } %>
+      <fieldset data-hook="suppliers" class=" no-border-bottom">
+        <legend align="center"><%= t(:supplier_details) %></legend>
+        
+        <div data-hook="name" class="field">
+          <%= f.label :name, t(:name) %>
+          <abbr title="required">*</abbr>
+          <%= f.text_field :name, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="abbreviation" class="field">
+          <%= f.label :abbreviation, t(:vendor_code) %>
+          <abbr title="required">*</abbr>
+          <%= f.text_field :abbreviation, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="account_number" class="field">
+          <%= f.label :account_number, t(:account_number) %>
+          <abbr title="required">*</abbr>
+          <%= f.text_field :account_number, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="nr_account_number" class="field">
+          <%= f.label :nr_account_number, t(:non_returnable_account_number) %>
+          <%= f.text_field :nr_account_number, :class => 'fullwidth' %>
+        </div>
+        
+        <div data-hook="email" class="field">
+          <%= f.label :email, t(:email_address) %>
+          <abbr title="required">*</abbr>
+          <%= f.text_field :email, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="url" class="field">
+          <%= f.label :url, t(:web_site) %>
+          <%= f.text_field :url, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="phone" class="field">
+          <%= f.label :phone, t(:phone_number) %>
+            <abbr title="required">*</abbr>
+          <%= f.text_field :phone, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="po-comments" class="field">
+          <%= f.label :po_comments, "PO comments (shows up on PDF)" %>
+          <%= f.text_area :po_comments, :class => 'fullwidth', :rows => 5, :cols => 20 %>
+        </div>
+
+        <div data-hook="comments" class="field">
+          <%= f.label :comments, t(:comments) %>
+          <%= f.text_area :comments, :class => 'fullwidth', :rows => 5, :cols => 20 %>
+        </div>
+
+        <div data-hook="discount_quantities" class="field four columns alpha" >
+          <%= f.label :discount_quantities, "Non-returnable discount qty" %>
+          <%= f.text_area :discount_quantities, :rows => 5, :cols => 30, placeholder:  "Enter cut off one per line" %>
+        </div>
+        
+        <div data-hook="discount_rates" class="field four columns omega" >
+          <%= f.label :discount_rates, "Non-returnable discount rates" %>
+          <%= f.text_area :discount_rates, :rows => 5, :cols => 30, placeholder: "Enter whole numbers one per line, ie: 30 for 30%" %>
+        </div>
+        
+        <div class="clear"></div>
+
+        <div data-hook="returnable_quantities" class="field four columns alpha" >
+          <%= f.label :returnable_quantities, "Returnable discount qty" %>
+          <%= f.text_area :returnable_quantities, :rows => 5, :cols => 30, placeholder:  "Enter cut off one per line" %>
+        </div>
+        
+        <div data-hook="returnable_rates" class="field four columns omega" >
+          <%= f.label :returnable_rates, "Returnable discount rates" %>
+          <%= f.text_area :returnable_rates, :rows => 5, :cols => 30, placeholder: "Enter whole numbers one per line, ie: 30 for 30%" %>
+        </div>        
+
+        <div class="clear"></div>
+
+        <div data-hook="intl_phone" class="field">
+          <%= f.label :intl_phone, t(:international_phone_number) %>
+          <%= f.text_field :intl_phone, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="fax" class="field">
+          <%= f.label :fax, t(:fax_number) %>
+          <%= f.text_field :fax, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="intl_fax" class="field">
+          <%= f.label :intl_fax, t(:international_fax_number) %>
+          <%= f.text_field :intl_fax, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="address1" class="field">
+          <%= f.label :address1, t(:address) %>
+          <%= f.text_field :address1, :class => 'fullwidth' %>
+          <%= f.text_field :address2, :class => 'fullwidth' %>
+          <%= f.text_field :address3, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="city" class="field">
+          <%= f.label :city, t(:city) %>
+          <%= f.text_field :city, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="state" class="field">
+          <%= f.label :state, t(:state) %>
+          <%= f.text_field :state, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="zip" class="field">
+          <%= f.label :zip, t(:zip) %>
+          <%= f.text_field :zip, :class => 'fullwidth' %>
+        </div>
+
+        <div data-hook="country" class="field">
+          <%= f.label :country, t(:country) %>
+          <%= f.collection_select :country, available_countries, :name, :name, {prompt: "Select a country"}, {:class => 'select2 fullwidth'} %>
+        </div>
+
+      </fieldset>
+    </div>
+
+    <div class="eight columns omega">
+      <%= render :partial => 'spree/shared/error_messages', :locals => { :target => @new_supplier_contact } %>
+      <% unless @supplier.supplier_contacts.size == 0 %>
+        <fieldset data-hook="supplier-contacts" class=" no-border-bottom">
+          <legend align="center"><%= t(:existing_contacts) %></legend>
+
+          <%= render partial: "spree/admin/supplier_contacts/contact", collection: @supplier.supplier_contacts.order("name asc") %>
+
+          <% unless @supplier.supplier_contacts.size > 0 %>
+            None
+          <% end %>
+        </fieldset>
+      <% end %>
+
+      <div class="clear"></div>
+      
+      <fieldset data-hook="new-supplier-contact" class=" no-border-bottom">
+        <legend align="center"><%= t(:new_supplier_contact) %></legend>
+        
+        <%= f.fields_for :supplier_contacts, @new_supplier_contact do |sc| %>
+
+          <div data-hook="supplier_contact_name" class="field">
+            <%= sc.label :name, t(:name) %>
+            <abbr title="required">*</abbr>
+            <%= sc.text_field :name, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_job_title" class="field">
+            <%= sc.label :job_title, t(:job_title) %>
+            <%= sc.text_field :job_title, :class => 'fullwidth' %>
+          </div>        
+
+          <div data-hook="supplier_contact_email" class="field">
+            <%= sc.label :email, t(:email_address) %>
+            <abbr title="required">*</abbr>
+            <%= sc.text_field :email, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_url" class="field">
+            <%= sc.label :url, t(:web_site) %>
+            <%= sc.text_field :url, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_phone" class="field">
+            <%= sc.label :phone, t(:phone_number) %>
+            <%= sc.text_field :phone, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_fax" class="field">
+            <%= sc.label :fax, t(:fax_number) %>
+            <%= sc.text_field :fax, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_address1" class="field">
+            <%= sc.label :address1, t(:address) %>
+            <%= sc.text_field :address1, :class => 'fullwidth' %>
+            <%= sc.text_field :address2, :class => 'fullwidth' %>
+            <%= sc.text_field :address3, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_city" class="field">
+            <%= sc.label :city, t(:city) %>
+            <%= sc.text_field :city, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_state" class="field">
+            <%= sc.label :state, t(:state) %>
+            <%= sc.text_field :state, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_zip" class="field">
+            <%= sc.label :zip, t(:zip) %>
+            <%= sc.text_field :zip, :class => 'fullwidth' %>
+          </div>
+
+          <div data-hook="supplier_contact_country" class="field">
+            <%= sc.label :country, t(:country) %>
+            <%= sc.collection_select :country, available_countries, :name, :name, {prompt: "Select a country"}, {:class => 'select2 fullwidth'} %>
+          </div>
+
+        <% end  %>
+      </fieldset>
+      <br/>
+
+      <fieldset data-hook="rtf-template" class=" no-border-bottom">
+        <legend align="center"><%= t(:optional_rtf_template) %></legend>
+          <div data-hook="supplier_rtf_template" class="field">
+            <%= file_field_tag "rtf_template" %>
+            <% if @supplier.try(:rtf_template) %>
+              <br/>
+              Previously uploaded template is <%= @supplier.rtf_template.size %> characters.
+            <% end %>
+          </div>
+         
+      </fieldset>
+      <br/>
+ 
+    </div>
+
+  </div>
+</div>
+
+<script>
+	$("#supplier_contact_country").select2();
+	$("#supplier_country").select2();
+</script>

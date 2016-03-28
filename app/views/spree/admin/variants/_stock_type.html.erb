@@ -1,0 +1,2 @@
+<label>Stock type</label>
+<%= select_tag "variant[stock_type]", options_for_select({ "Regular" => "R", "Buyback" => "B", "Consignment" => "C"}, @variant.stock_type), class: "select2" %>

@@ -1,0 +1,30 @@
+<tr valign="top">
+  <td>
+    <%= line_item.variant.product.name.split(":").first %>
+   
+    <br/>
+    <% if line_item.variant.product.images.first and line_item.variant.product.images.first.attachment %>
+      <%= image_tag(line_item.variant.product.images.first.attachment.url(:mini), 
+                    width: "25",
+                    valign: "middle", 
+                    align: "left",
+                    style: "margin-right: 10px") %>
+    <% end %>
+    
+    <% if admin_product_inventory_path(line_item.variant.product) %>
+      <%= link_to line_item.variant.sku, admin_product_inventory_path(line_item.variant.product) + "##{line_item.variant.sku}" %>
+    <% else %>
+      <%= link_to line_item.variant.sku, edit_admin_product_variant_path(product_id: line_item.variant.product, id: line_item.variant_d) %>
+    <% end %>
+    <br/>
+    On hand: <%= line_item.variant.on_hand %>
+
+  </td>
+  <td width="10%" class="align-center"><%= line_item.quantity  %></td>
+  <td width="10%" class="align-center"><%= line_item.gross_profit_percentage %></td>
+  <td width="10%" class="align-center"><%= number_to_currency(line_item.price) %></td>
+  
+</tr>
+
+
+
